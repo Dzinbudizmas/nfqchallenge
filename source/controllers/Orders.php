@@ -18,4 +18,27 @@ class Orders extends CI_Controller {
         $this->load->view('templates/footer');
 	}
 
+	public function create()
+	{
+		$this->load->helper('form');
+		$this->load->library('form_validation');
+
+		$data['title'] = 'Užsakyti paslaugą';
+
+		$this->form_validation->set_rules('name', 'Name', 'required');
+		$this->form_validation->set_rules('address', 'Address', 'required');
+		$this->form_validation->set_rules('phone', 'Phone', 'required');
+
+		if ($this->form_validation->run() === FALSE)
+		{
+			$this->load->view('templates/header', $data);
+			$this->load->view('orders/create');
+			$this->load->view('templates/footer');
+		}
+		else
+		{
+			$this->order_model->set_order();
+			$this->load->view('orders/success');
+		}
+	}
 }
