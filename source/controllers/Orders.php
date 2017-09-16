@@ -67,25 +67,23 @@ class Orders extends CI_Controller {
 	public function create()
 	{
 		$this->load->library('form_validation');
-		
-		$data['title'] = "Submit your order";
-		
-		$this->form_validation->set_rules('name', 'Name', 'required');
-		$this->form_validation->set_rules('address', 'Address', 'required');
-		$this->form_validation->set_rules('phone', 'Phone', 'required');
-		$this->form_validation->set_rules('amount', 'Amount', 'required');
+		$this->form_validation->set_error_delimiters('<div class="alert alert-danger">', '</div>');		
+		$this->form_validation->set_rules('name', 'Name', 'required|min_length[3]|max_length[120]');
+		$this->form_validation->set_rules('address', 'Address', 'required|min_length[10]|max_length[250]');
+		$this->form_validation->set_rules('phone', 'Phone', 'required|min_length[4]|max_length[15]|alpha_numeric_spaces');
+		$this->form_validation->set_rules('amount', 'Amount', 'required|integer|less_than_equal_to[100]');
 		
 		if ($this->form_validation->run() === FALSE)
 		{
-			$this->load->view('templates/header', $data);
+			$this->load->view('templates/header');
 			$this->load->view('orders/create');
 			$this->load->view('templates/footer');
 		}
 		else
 		{
 			$this->order_model->insert_order();
-			$this->load->view('templates/header', $data);
-			$this->load_view('orders/success');
+			$this->load->view('templates/header');
+			$this->load->view('orders/success');
 			$this->load->view('templates/footer');
 		}
 	}
