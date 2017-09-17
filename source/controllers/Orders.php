@@ -8,26 +8,26 @@ class Orders extends CI_Controller {
 		$this->load->model('order_model');
 		$this->load->helper('url_helper');
 	}
-	
+
 	public function index()
 	{
 		$this->load->library('pagination');
 		$this->load->library('session');
-		
+
 		// get search string
 		$search = ($this->input->get('query')) ? $this->input->get('query') : NULL;
-		
+
 		$config['base_url'] = site_url('orders/index');
 		$config['total_rows'] = $this->order_model->get_order_count($search);
 		$config['per_page'] = 10;
 		$config["uri_segment"] = 3;
 		$choice = $config["total_rows"] / $config["per_page"];
 		$config["num_links"] = floor($choice);
-		
+
 		$config['enable_query_strings'] = TRUE;
 		$config['page_query_string'] = TRUE;
 		$config['reuse_query_string'] = TRUE;
-		
+
 		// bootstrap pagination
         $config['full_tag_open'] = '<ul class="pagination">';
         $config['full_tag_close'] = '</ul>';
@@ -50,15 +50,15 @@ class Orders extends CI_Controller {
         $this->pagination->initialize($config);
 
 		$data['page'] = ($this->uri->segment(3)) ? $this->uri->segment(3) : 0;
-		
+
 		$data['page'] = ($this->input->get('per_page')) ? $this->input->get('per_page') : 0;
 		$data['searchFor'] = $search;
 		$data['orderField'] = ($this->input->get('orderField')) ? $this->input->get('orderField') : 'id';
 		$data['orderDirection'] = ($this->input->get('orderDirection')) ? $this->input->get('orderDirection') : 'ASC';
-		
+
 		$data['pagination_links'] = $this->pagination->create_links();
 		$data['orders'] = $this->order_model->get_orders($config["per_page"], $data['page'], $search, $data['orderField'], $data['orderDirection']);
-		
+
 		$this->load->view('templates/header', $data);
 		$this->load->view('orders/index', $data);
 		$this->load->view('templates/footer');
@@ -67,12 +67,12 @@ class Orders extends CI_Controller {
 	public function create()
 	{
 		$this->load->library('form_validation');
-		$this->form_validation->set_error_delimiters('<div class="alert alert-danger">', '</div>');		
-		$this->form_validation->set_rules('name', 'Name', 'required|min_length[3]|max_length[120]');
-		$this->form_validation->set_rules('address', 'Address', 'required|min_length[10]|max_length[250]');
+		$this->form_validation->set_error_delimiters('<div class="alert alert-danger">', '</div>');
+		$this->form_validation->set_rules('name', 'Name', 'required|min_length[3]|max_length[30]');
+		$this->form_validation->set_rules('address', 'Address', 'required|min_length[10]|max_length[50]');
 		$this->form_validation->set_rules('phone', 'Phone', 'required|min_length[4]|max_length[15]|alpha_numeric_spaces');
 		$this->form_validation->set_rules('amount', 'Amount', 'required|integer|less_than_equal_to[100]');
-		
+
 		if ($this->form_validation->run() === FALSE)
 		{
 			$this->load->view('templates/header');
