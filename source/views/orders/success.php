@@ -1,3 +1,3 @@
-<div class="alert alert-success">
-	Order created successfuly
+<div class="text-success">
+	Order created successfully.
 </div>
