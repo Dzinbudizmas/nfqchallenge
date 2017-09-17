@@ -15,29 +15,24 @@ class Orders extends CI_Controller {
 		$this->load->library('session');
 		
 		// get search string
-		$search = 'NIL';
-		if ($this->input->method() == 'post')
-		{
-			$search = $this->input->post('search_term');
-			$this->session->set_userdata('search_term', $search);
-		}
-		else
-		{
-			$search = $this->session->userdata('search_term');
-		}
+		$search = ($this->input->get('query')) ? $this->input->get('query') : NULL;
 		
 		$config['base_url'] = site_url('orders/index');
 		$config['total_rows'] = $this->order_model->get_order_count($search);
-		$config['per_page'] = 5;
+		$config['per_page'] = 10;
 		$config["uri_segment"] = 3;
 		$choice = $config["total_rows"] / $config["per_page"];
 		$config["num_links"] = floor($choice);
 		
+		$config['enable_query_strings'] = TRUE;
+		$config['page_query_string'] = TRUE;
+		$config['reuse_query_string'] = TRUE;
+		
 		// bootstrap pagination
         $config['full_tag_open'] = '<ul class="pagination">';
         $config['full_tag_close'] = '</ul>';
-        $config['first_link'] = false;
-        $config['last_link'] = false;
+        //$config['first_link'] = false;
+        //$config['last_link'] = false;
         $config['first_tag_open'] = '<li>';
         $config['first_tag_close'] = '</li>';
         $config['prev_link'] = '«';
@@ -56,9 +51,14 @@ class Orders extends CI_Controller {
 
 		$data['page'] = ($this->uri->segment(3)) ? $this->uri->segment(3) : 0;
 		
+		$data['page'] = ($this->input->get('per_page')) ? $this->input->get('per_page') : 0;
+		$data['searchFor'] = $search;
+		$data['orderField'] = ($this->input->get('orderField')) ? $this->input->get('orderField') : 'id';
+		$data['orderDirection'] = ($this->input->get('orderDirection')) ? $this->input->get('orderDirection') : 'ASC';
+		
 		$data['pagination_links'] = $this->pagination->create_links();
-		$data['orders'] = $this->order_model->get_orders($config["per_page"], $data['page'], $search);
-
+		$data['orders'] = $this->order_model->get_orders($config["per_page"], $data['page'], $search, $data['orderField'], $data['orderDirection']);
+		
 		$this->load->view('templates/header', $data);
 		$this->load->view('orders/index', $data);
 		$this->load->view('templates/footer');

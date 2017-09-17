@@ -5,7 +5,7 @@ class Order_model extends CI_Model {
 		$this->load->database();
 	}
 	
-	public function get_orders($limit, $start, $search_term = NULL)
+	public function get_orders($limit, $start, $search_term = NULL, $order_field = NULL, $order_direction = NULL)
 	{
 		if ($search_term == 'NIL')
 		{
@@ -13,6 +13,10 @@ class Order_model extends CI_Model {
 		}
 		
 		$this->db->like('name', $search_term);
+		if ($order_field != 'NIL' and $order_direction != 'NIL')
+		{
+			$this->db->order_by($order_field, $order_direction);
+		}
 		$query = $this->db->get('orders', $limit, $start);
 		return $query->result_array();
 	}
